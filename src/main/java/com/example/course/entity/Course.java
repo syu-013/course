@@ -1,4 +1,4 @@
-package entity;
+package com.example.course.entity;
 
 import java.sql.Date;
 import java.sql.Time;
