@@ -1,7 +1,7 @@
 package com.example.course.entity;
 
-import java.sql.Date;
-import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -14,9 +14,9 @@ public class Course {
     private int capacity;
     private String location;
     private int price;
-    private Date start_date;
-    private Date end_date;
-    private Time start_Time;
-    private Time end_Time;
+    private LocalDate start_date;
+    private LocalDate end_date;
+    private LocalDateTime start_Time;
+    private LocalDateTime end_Time;
     private String status;
 }
