@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>講座一覧</title>
+  <style>
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      background-color: #fff;
+      text-align: center;
+      margin: 30px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .date-range {
+      margin: 20px 0;
+    }
+    select {
+      margin: 0 2px;
+      padding: 3px;
+    }
+    button {
+      margin: 15px;
+      padding: 6px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    table {
+      width: 90%;
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #cce0f5;
+    }
+    a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .footer-button {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>講座一覧</h1>
+
+  <div class="date-range">
+    <select>
+      <option>2025</option>
+    </select>年
+    <select>
+      <option>6</option>
+    </select>月
+    <select>
+      <option>10</option>
+    </select>日
+    〜
+    <select>
+      <option>2025</option>
+    </select>年
+    <select>
+      <option>6</option>
+    </select>月
+    <select>
+      <option>19</option>
+    </select>日
+  </div>
+
+  <button onclick="searchCourses()">検索</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>講座名（場所）</th>
+        <th>定員数</th>
+        <th>受講金額</th>
+        <th>講師名</th>
+        <th>開講日付</th>
+        <th>開講時間</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr th:each="c,row:${cList}">
+            <td><span th:text="*{c.course_id}"></span></td>
+            <td><span th:text="*{c.course_name}"></span></td>
+            <td><span th:text="*{c.instructor_id}"></span></td>
+            <td><span th:text="*{c.capacity}"></span></td>
+            <td><span th:text="*{c.location}"></span></td>
+            <td><span th:text="*{c.price}"></span></td>
+            <td><span th:text="*{c.staet_date}"></span></td>
+            <td><span th:text="*{c.end_date}"></span></td>
+            <td><span th:text="*{c.staet_Time}"></span></td>
+            <td><span th:text="*{c.end_time}"></span></td>
+            <td><span th:text="*{c.status}"></span></td>
+
+    </tbody>
+  </table>
+
+  <div class="footer-button">
+    <button onclick="goToConfirm()">登録講座確認</button>
+  </div>
+
+  <script>
+    // 🔍 検索ボタンを押したときの動作（例：検索処理）
+    function searchCourses() {
+      alert("入力した期間の講座を検索します。");
+      // 実際の検索ロジックはここに追加します。
+    }
+
+    // ✅ 登録講座確認ボタン：メールアドレス確認画面に遷移
+    function goToConfirm() {
+      window.location.href = "email_confirm.html";
+    }
+  </script>
+
+</body>
+</html>
