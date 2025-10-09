@@ -60,7 +60,8 @@
                     const row = document.createElement('tr');
                     row.className = 'participant-row';
                     row.innerHTML = `
-                        <th>${i === 1 ? '氏名' : ''}</th> <td colspan="3">
+                        <th>${i === 1 ? '氏名' : ''}</th> 
+                        <td colspan="3">
                             <input type="text" name="participantName${i}" placeholder="受講者${i + 1}の氏名を入力" required>
                         </td>
                     `;
