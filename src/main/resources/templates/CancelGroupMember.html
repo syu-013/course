@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>グループキャンセル画面 - 講座受講受付システム</title>
+    <style>
+        /* スタイルの例：実際にはCSSファイルに記述します */
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        h2 { border-bottom: 2px solid #0056b3; padding-bottom: 5px; color: #0056b3; }
+        .course-info p { margin: 5px 0; }
+        .participant-list { margin-top: 20px; }
+        .participant-item { padding: 10px; border: 1px solid #eee; margin-bottom: 10px; border-radius: 3px; }
+        .button-group { text-align: center; margin-top: 30px; }
+        .button-group button { padding: 10px 20px; margin: 0 10px; cursor: pointer; }
+        .attention { color: red; font-weight: bold; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>グループキャンセル手続き</h2>
+        
+        <div class="course-info">
+            <h3>お申し込み講座情報</h3>
+            <p><strong>講座名:</strong> 【講座ID: 001】Webデザイン基礎講座</p>
+            <p><strong>開催日時:</strong> 2025年12月15日(月) 10:00 - 17:00</p>
+            <p><strong>代表者:</strong> 山田 太郎 様</p>
+        </div>
+
+        <hr>
+
+        <form action="/enrollment/cancel/group/submit" method="POST">
+            <input type="hidden" name="enrollmentId" value="[申し込みID]">
+            <input type="hidden" name="groupId" value="[グループID]">
+
+            <h3>キャンセル対象者の選択</h3>
+            
+            <p>キャンセルしたい受講者の氏名にチェックを入れてください。</p>
+            <p class="attention">※チェックを入れた受講者のみがキャンセルされます。</p>
+
+            <div class="participant-list">
+                <div class="participant-item">
+                    <label>
+                        <input type="checkbox" name="cancelledStudentIds" value="[受講者ID: 101]">
+                        <strong>受講者1:</strong> 山田 太郎 (代表者)
+                    </label>
+                </div>
+
+                <div class="participant-item">
+                    <label>
+                        <input type="checkbox" name="cancelledStudentIds" value="[受講者ID: 102]" checked>
+                        <strong>受講者2:</strong> 佐藤 花子
+                    </label>
+                </div>
+                
+                <div class="participant-item">
+                    <label>
+                        <input type="checkbox" name="cancelledStudentIds" value="[受講者ID: 103]">
+                        <strong>受講者3:</strong> 田中 次郎
+                    </label>
+                </div>
+
+                <div class="participant-item" style="margin-top: 20px; background-color: #ffe0e0; border-color: red;">
+                    <label>
+                        <input type="checkbox" name="cancelAllFlag" value="true">
+                        **【全員キャンセル】** グループ内の全受講者をキャンセルする
+                    </label>
+                </div>
+
+            </div>
+
+            <hr>
+            
+            <div class="button-group">
+                <button type="submit" onclick="return confirm('選択した受講者をキャンセルしてもよろしいですか？')">キャンセル実行</button>
+                <button type="button" onclick="history.back()">戻る</button>
+            </div>
+            
+        </form>
+
+    </div>
+
+</body>
+</html>
