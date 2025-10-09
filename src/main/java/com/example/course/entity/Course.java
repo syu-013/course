@@ -7,6 +7,7 @@ import lombok.Data;
 
 //講座情報
 @Data
+
 public class Course {
     private int course_id;
     private String course_name;
