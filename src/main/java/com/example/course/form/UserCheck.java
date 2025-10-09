@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class UserCheck {
     @NotBlank(message = "※氏名を入力してください")
-    String userName;
+    private String userName;
     @NotBlank(message = "※メールアドレスを入力してください")
-    String email;
+    private String email;
 }

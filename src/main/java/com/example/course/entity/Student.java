@@ -5,7 +5,7 @@ import lombok.Data;
 //受講者情報
 @Data
 public class Student {
-    int StudentID;
-    String name;
-    String email;
+    private int StudentID;
+    private String name;
+    private String email;
 }
