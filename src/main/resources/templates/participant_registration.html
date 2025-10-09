@@ -5,40 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>受講者登録</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* 代表者氏名とその他の氏名の区別を分かりやすくするためのスタイル */
+        .representative-row th {
+            background-color: #e0f2f7; /* 薄い青など */
+        }
+        .participant-row th {
+            background-color: #f9f9f9;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>受講者登録</h1>
-        <form action="/course/register" method="post">
+        <form action="/course/registerParticipant" method="post" id="registrationForm">
             <table class="form-table">
-                <tr>
+                <tr class="representative-row">
                     <th colspan="2">代表者氏名</th>
                     <td colspan="2">
                         <input type="text" name="representativeName" placeholder="氏名を入力" required>
                     </td>
                 </tr>
                 
-                <tr>
-                    <th rowspan="4">氏名</th>
-                    <td colspan="3">
-                        <input type="text" name="participantName1" placeholder="受講者1の氏名を入力" required>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3">
-                        <input type="text" name="participantName2" placeholder="受講者2の氏名を入力">
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3">
-                        <input type="text" name="participantName3" placeholder="受講者3の氏名を入力">
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3" style="text-align: center; color: #666; font-style: italic;">
-                        ...
-                    </td>
-                </tr>
+                <tbody id="participantNamesBody">
+                    </tbody>
                 
                 <tr>
                     <th colspan="2">代表者メールアドレス</th>
@@ -50,9 +40,34 @@
 
             <div class="button-area">
                 <button type="submit" class="register-button">登録</button>
-                <button type="button" class="cancel-button">キャンセル</button>
+                <button type="button" class="cancel-button" onclick="history.back()">キャンセル</button>
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const numParticipants = parseInt(urlParams.get('participants') || '1', 10); // デフォルトは1人
+
+            const participantNamesBody = document.getElementById('participantNamesBody');
+            
+            // 参加人数が1人の場合は代表者氏名のみなので、追加の氏名欄は不要
+            // 2人以上の場合に、代表者以外の氏名欄を追加
+            if (numParticipants > 1) {
+                // 代表者を除く人数分ループ
+                for (let i = 1; i < numParticipants; i++) {
+                    const row = document.createElement('tr');
+                    row.className = 'participant-row';
+                    row.innerHTML = `
+                        <th>${i === 1 ? '氏名' : ''}</th> <td colspan="3">
+                            <input type="text" name="participantName${i}" placeholder="受講者${i + 1}の氏名を入力" required>
+                        </td>
+                    `;
+                    participantNamesBody.appendChild(row);
+                }
+            }
+        });
+    </script>
 </body>
 </html>

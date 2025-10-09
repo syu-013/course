@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>講座の詳細</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="detail-header">
+        <button type="button" class="back-button" onclick="history.back()">戻る</button>
+        <h1 class="detail-title">講座の詳細</h1>
+        <div style="width: 100px;"></div> 
+    </div>
+
+    <div class="container">
+        <table class="form-table">
+            <tr>
+                <th>講座名</th>
+                <td>プログラム開発技法</td>
+            </tr>
+            <tr>
+                <th>詳細</th>
+                <td>
+                    <div class="info-row">講師名：高井 先生</div>
+                    <div class="info-row">形式：Web</div>
+                    <div class="info-row">受講料：&#xA5;XX,XXX (税込)</div>
+                    <div class="info-row">
+                        定員：〇〇名(残り席数：〇〇席) 
+                        <span class="small-text">※1グループ5人まで</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>開催日時</th>
+                <td>
+                    <div class="info-row">
+                        &#x2015;2025年〇〇月〇〇日 (火) 10:00&#x2015;12:00
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div style="display: flex; justify-content: flex-end; align-items: flex-end; gap: 20px; margin-top: 30px;">
+            <button type="button" class="apply-button" onclick="location.href='participant_registration.html?participants=1'">申し込む</button>
+            
+            <div class="participant-count-area">
+                参加人数
+                <input type="number" id="numParticipants" name="numParticipants" value="1" min="1" max="5">
+                人
+                <span class="small-text">※1人の場合でも入力してください</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 「申し込む」ボタンがクリックされたときに、参加人数をURLに含めて遷移
+        document.querySelector('.apply-button').onclick = function() {
+            const numParticipants = document.getElementById('numParticipants').value;
+            location.href = `participant_registration.html?participants=${numParticipants}`;
+        };
+    </script>
+</body>
+</html>
