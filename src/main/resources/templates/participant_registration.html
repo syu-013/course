@@ -4,39 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>受講者登録</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <h1>受講者登録</h1>
-        <form action="#" method="post">
+        <form action="/course/register" method="post">
             <table class="form-table">
                 <tr>
                     <th colspan="2">代表者氏名</th>
                     <td colspan="2">
-                        <input type="text" name="representative_name" placeholder="〇〇 〇〇" required>
+                        <input type="text" name="representativeName" placeholder="氏名を入力" required>
                     </td>
                 </tr>
+                
                 <tr>
-                    <th rowspan="3">氏名</th>
+                    <th rowspan="4">氏名</th>
                     <td colspan="3">
-                        <input type="text" name="participant_name_1" placeholder="〇〇 〇〇" required>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3">
-                        <input type="text" name="participant_name_2" placeholder="〇〇 〇〇">
+                        <input type="text" name="participantName1" placeholder="受講者1の氏名を入力" required>
                     </td>
                 </tr>
                 <tr>
                     <td colspan="3">
+                        <input type="text" name="participantName2" placeholder="受講者2の氏名を入力">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <input type="text" name="participantName3" placeholder="受講者3の氏名を入力">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: center; color: #666; font-style: italic;">
                         ...
                     </td>
                 </tr>
+                
                 <tr>
                     <th colspan="2">代表者メールアドレス</th>
                     <td colspan="2">
-                        <input type="email" name="representative_email" placeholder="〇〇 〇〇" required>
+                        <input type="email" name="representativeEmail" placeholder="メールアドレスを入力" required>
                     </td>
                 </tr>
             </table>
