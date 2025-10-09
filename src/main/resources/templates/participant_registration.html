@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>受講者登録</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>受講者登録</h1>
+        <form action="#" method="post">
+            <table class="form-table">
+                <tr>
+                    <th colspan="2">代表者氏名</th>
+                    <td colspan="2">
+                        <input type="text" name="representative_name" placeholder="〇〇 〇〇" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th rowspan="3">氏名</th>
+                    <td colspan="3">
+                        <input type="text" name="participant_name_1" placeholder="〇〇 〇〇" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <input type="text" name="participant_name_2" placeholder="〇〇 〇〇">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        ...
+                    </td>
+                </tr>
+                <tr>
+                    <th colspan="2">代表者メールアドレス</th>
+                    <td colspan="2">
+                        <input type="email" name="representative_email" placeholder="〇〇 〇〇" required>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="button-area">
+                <button type="submit" class="register-button">登録</button>
+                <button type="button" class="cancel-button">キャンセル</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
