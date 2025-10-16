@@ -1,5 +1,6 @@
 package com.example.course.form;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -11,5 +12,6 @@ public class EnrollmentForm {
     
     // 代表者のメールアドレス
     @NotBlank(message = "※代表者のメールアドレスを入力してください")
+    @Email(message = "※代表者のメールアドレスを入力してください")
     private String representativeEmail;
 }
