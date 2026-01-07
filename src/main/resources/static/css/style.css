@@ -1,0 +1,186 @@
+body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column; /* 複数コンテンツを縦に並べる場合を考慮 */
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 800px; /* 詳細画面に合わせて幅を調整 */
+    padding: 30px;
+    border: 1px solid #000;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px; /* 複数のコンテナがある場合のため */
+}
+
+h1 {
+    text-align: center;
+    font-size: 1.5em;
+    margin-bottom: 30px;
+}
+
+/* 講座詳細画面のヘッダー部分 */
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 800px; /* コンテナと同じ幅 */
+    margin-bottom: 20px;
+}
+
+.back-button {
+    padding: 10px 20px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: 1px solid #000;
+    background-color: #ffff00; /* 黄色 */
+    cursor: pointer;
+    width: 100px;
+    height: 40px;
+    text-align: center;
+    line-height: 20px;
+}
+
+.back-button:hover {
+    opacity: 0.8;
+}
+
+.detail-title {
+    font-size: 1.8em;
+    font-weight: bold;
+    text-align: center;
+    flex-grow: 1; /* 中央に配置 */
+}
+
+
+/* フォームの共通スタイル */
+.form-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.form-table th, .form-table td {
+    padding: 10px;
+    border: 1px solid #000;
+    vertical-align: top; /* 上揃え */
+}
+
+.form-table th {
+    width: 25%; /* <th>の幅を調整 */
+    text-align: left;
+    background-color: #f9f9f9;
+}
+
+.form-table td {
+    background-color: #fff;
+}
+
+.form-table input[type="text"],
+.form-table input[type="email"],
+.form-table input[type="number"] {
+    width: calc(100% - 20px); /* 枠内に収まるように調整 */
+    padding: 8px 10px;
+    border: none; /* tdの枠線で表現するためinputの枠線は不要 */
+    box-sizing: border-box;
+}
+
+/* 詳細情報表示用 */
+.info-row {
+    padding: 5px 10px;
+    margin-bottom: 5px;
+}
+
+.small-text {
+    font-size: 0.9em;
+    color: #cc0000; /* 赤色 */
+    margin-left: 10px;
+}
+
+/* ボタンエリア */
+.button-area {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.button-area button {
+    padding: 10px 30px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: 1px solid #000;
+    cursor: pointer;
+    width: 150px;
+    height: 50px;
+}
+
+.button-area .register-button,
+.button-area .apply-button,
+.button-area .list-button {
+    background-color: #ffff00; /* 黄色 */
+}
+
+.button-area .cancel-button {
+    background-color: #ffff00; /* 黄色 */
+}
+
+.button-area button:hover {
+    opacity: 0.8;
+}
+
+/* 参加人数入力部分 (講座詳細画面用) */
+.participant-count-area {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* 右寄せ */
+    margin-top: 20px;
+    gap: 10px;
+    font-size: 0.9em;
+}
+
+.participant-count-area input[type="number"] {
+    width: 60px;
+    padding: 5px;
+    text-align: right;
+    border: 1px solid #ccc;
+}
+
+/* ... (既存の body, h1, .form-table のスタイルは省略) ... */
+
+body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column; 
+    justify-content: flex-start; /* 画面上部に寄せるためflex-startに変更 */
+    align-items: center; /* ★★★ コンテナとヘッダー全体を中央揃え ★★★ */
+    min-height: 100vh;
+    margin: 0;
+    padding-top: 50px; /* 画面上部に少しスペースを確保 */
+    background-color: #f4f4f4;
+}
+
+.detail-header {
+    /* widthを固定値から相対値に変更し、画面幅に応じて中央に */
+    width: 800px; /* ★★★ コンテナと幅を合わせ、中央に配置 ★★★ */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.container {
+    width: 800px; /* ★★★ 中央寄せの基準となるコンテナ幅 ★★★ */
+    padding: 30px;
+    border: 1px solid #000;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 0 auto 20px auto; /* 上下20px、左右autoで中央配置を確実にする */
+}
+
+/* ... (ボタンエリアは既に中央寄せになっているので変更なし) ... */

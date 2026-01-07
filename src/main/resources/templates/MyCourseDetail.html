@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>講座の詳細（キャンセル）</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* CSSファイルがない場合を考慮し、最低限のレイアウトを確保 */
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 800px;
+            /* 適切な幅に調整 */
+            margin-bottom: 20px;
+        }
+
+        .detail-header .back-button {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: 1px solid #000;
+            background-color: #ffff00;
+            /* 黄色 */
+            cursor: pointer;
+            width: 100px;
+            height: 40px;
+        }
+
+        .detail-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .form-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            border: 1px solid #000;
+        }
+
+        .form-table th,
+        .form-table td {
+            padding: 10px;
+            border: 1px solid #000;
+            vertical-align: top;
+        }
+
+        .form-table th {
+            width: 25%;
+            text-align: left;
+            background-color: #f9f9f9;
+        }
+
+        .info-row {
+            padding: 5px 0;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="detail-header">
+        <button type="button" class="back-button" onclick="history.back()">戻る</button>
+        <h1 class="detail-title">講座の詳細</h1>
+        <div style="width: 100px;"></div>
+        <div style="width: 100px;"></div>
+    </div>
+
+    <div class="container" style="width: 800px;">
+        <table class="form-table">
+            <tr>
+                <th>講座名</th>
+                <td th:text="${course.course_name}"></td>
+            </tr>
+            <tr>
+                <th>詳細</th>
+                <td>
+                    <div class="info-row">講師ID：<span th:text="${course.instructor_id}"></span></div>
+                    <div class="info-row">開催場所：<span th:text="${course.location}"></span></div>
+                    <div class="info-row">受講料：¥<span
+                            th:text="${#numbers.formatInteger(course.price, 3, 'COMMA')}"></span></div>
+                    <div class="info-row">
+                        定員：<span th:text="${course.capacity}"></span>名　
+                        （残り <span th:text="${remainingSeats}"></span> 席）
+                        <span class="small-text">※1グループ5人まで</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>開催期間</th>
+                <td>
+                    <div class="info-row">
+                        <span th:text="${#temporals.format(course.start_date, 'yyyy年MM月dd日')}"></span> ～
+                        <span th:text="${#temporals.format(course.end_date, 'yyyy年MM月dd日')}"></span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>時間</th>
+                <td>
+                    <div class="info-row">
+                        <span th:text="${#temporals.format(course.start_Time, 'HH:mm')}"></span> ～
+                        <span th:text="${#temporals.format(course.end_Time, 'HH:mm')}"></span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>ステータス</th>
+                <td th:text="${course.status}"></td>
+            </tr>
+        </table>
+
+        <form method="get">
+            <div class="button-area">
+
+                <!-- グループキャンセル -->
+                <button type="submit" th:formaction="@{/course/groupCancel(course_id=${course.course_id})}"
+                    class="cancel-button">
+                    グループキャンセル
+                </button>
+
+                <!-- 個人キャンセル -->
+                <button type="submit" th:formaction="@{/cancelIndividual(course_id=${course.course_id})}"
+                    class="cancel-button">
+                    個人キャンセル
+                </button>
+
+            </div>
+        </form>
+
+    </div>
+</body>
+
+</html>

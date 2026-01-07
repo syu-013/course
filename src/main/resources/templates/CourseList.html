@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <title>講座一覧</title>
+  <style>
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      background-color: #fff;
+      text-align: center;
+      margin: 30px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .date-range {
+      margin: 20px 0;
+    }
+
+    select {
+      margin: 0 2px;
+      padding: 3px;
+    }
+
+    button {
+      margin: 15px;
+      padding: 6px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    table {
+      width: 90%;
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border: 1px solid #333;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #cce0f5;
+    }
+
+    a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-button {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>講座一覧</h1>
+
+  <!-- 🔍 検索フォーム -->
+  <div class="date-range">
+    <form th:action="@{/course/search}" method="get" th:object="${searchForm}">
+      <input type="number" name="startYear" th:value="*{startYear}" min="2025" step="1">年
+      <input type="number" name="startMonth" th:value="*{startMonth}" min="1" max="12" step="1">月
+      <input type="number" name="startDate" th:value="*{startDate}" min="1" max="31" step="1">日
+      〜
+      <input type="number" name="endYear" th:value="*{endYear}" min="2025" step="1">年
+      <input type="number" name="endMonth" th:value="*{endMonth}" min="1" max="12" step="1">月
+      <input type="number" name="endDate" th:value="*{endDate}" min="1" max="31" step="1">日
+      <button type="submit">検索</button>
+      <a th:href="@{/course/list}" style="text-decoration: none;">
+        <button type="button"
+          style="background-color: #f0f0f0; border: 1px solid #333; padding: 6px 20px; font-size: 16px; cursor: pointer;">リセット</button>
+      </a>
+    </form>
+
+    <p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
+  </div>
+
+  <!-- 📋 講座一覧テーブル -->
+  <table>
+    <thead>
+      <tr>
+        <th>講座名（場所）</th>
+        <th>定員数</th>
+        <th>受講金額</th>
+        <th>講師名</th>
+        <th>開講期間</th>
+        <th>開講時間</th>
+        <th>終了時間</th>
+        <th>ステータス</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr th:each="c : ${cList}">
+        <td>
+          <a th:href="@{/course/detail/__${c.course_id}__}" th:text="${c.course_name} + '（' + ${c.location} + '）'">
+          </a>
+        </td>
+        <td th:text="${c.capacity}"></td>
+        <td th:text="${c.price}"></td>
+        <td th:text="${c.instructor_name}"></td>
+        <td th:text="${c.start_date} + ' ～ ' + ${c.end_date}"></td>
+        <td th:text="${c.start_Time}"></td>
+        <td th:text="${c.end_Time}"></td>
+        <td th:text="${c.status}"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 💡 登録講座確認ボタン -->
+  <form method="get">
+    <button type="submit" th:formaction="@{/course/userCheck}">
+      登録講座確認
+    </button>
+  </form>
+
+</body>
+
+</html>

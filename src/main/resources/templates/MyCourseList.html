@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登録講座一覧画面</title>
+    <style>
+        /* --- 全体レイアウト --- */
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+        }
+
+        .screen-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: white;
+            border: 1px solid #000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* --- タイトル --- */
+        .main-title {
+            font-size: 20px;
+            font-weight: bold;
+            border: 1px solid #000;
+            padding: 10px 30px;
+            display: inline-block;
+            margin-bottom: 30px;
+        }
+
+        /* --- 検索エリア (日付選択) --- */
+        .search-area {
+            margin-bottom: 25px;
+        }
+
+        .date-selector {
+            margin: 10px 0 20px 0;
+            font-size: 16px;
+        }
+
+        .date-selector select {
+            padding: 5px;
+            border: 1px solid #000;
+            margin: 0 3px;
+            width: 70px;
+            -webkit-appearance: menulist;
+            /* OS標準のプルダウンデザインを維持 */
+            -moz-appearance: menulist;
+            appearance: menulist;
+        }
+
+        .search-button {
+            padding: 8px 30px;
+            font-size: 16px;
+            border: 1px solid #000;
+            background-color: #e0e0e0;
+            margin-bottom: 25px;
+            cursor: pointer;
+        }
+
+        /* --- データテーブル --- */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000;
+        }
+
+        .data-table th,
+        .data-table td {
+            border: 1px solid #000;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .data-table th {
+            background-color: #d8e6f3;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .data-table td {
+            height: 40px;
+        }
+
+        /* --- 戻るボタン --- */
+        .back-button-container {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 24px;
+            background-color: #ffffff;
+            color: #333333;
+            text-decoration: none;
+            border: 2px solid #333333;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            box-shadow: 2px 2px 0px #333333;
+        }
+
+        .back-button:hover {
+            background-color: #333333;
+            color: #ffffff;
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        .back-button-icon {
+            margin-right: 8px;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .back-button:hover .back-button-icon {
+            transform: translateX(-4px);
+        }
+
+        .back-button:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px #333333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="screen-container">
+
+        <div class="back-button-container">
+            <a href="/course/exit" class="back-button">
+                <span class="back-button-icon">←</span>戻る
+            </a>
+        </div>
+
+        <div class="main-title">登録講座一覧画面</div>
+
+        <div class="search-area">
+            <form th:action="@{/course/search}" method="get" th:object="${searchForm}">
+                <input type="number" name="startYear" th:value="*{startYear}" min="2025" step="1">年
+                <input type="number" name="startMonth" th:value="*{startMonth}" min="1" max="12" step="1">月
+                <input type="number" name="startDate" th:value="*{startDate}" min="1" max="31" step="1">日
+                〜
+                <input type="number" name="endYear" th:value="*{endYear}" min="2025" step="1">年
+                <input type="number" name="endMonth" th:value="*{endMonth}" min="1" max="12" step="1">月
+                <input type="number" name="endDate" th:value="*{endDate}" min="1" max="31" step="1">日
+                <button type="submit">検索</button>
+                <a th:href="@{/course/list}" style="text-decoration: none;">
+                    <button type="button"
+                        style="background-color: #f0f0f0; border: 1px solid #000; padding: 2px 10px; cursor: pointer;">リセット</button>
+                </a>
+            </form>
+
+        </div>
+        <p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>講座名（場所）</th>
+                    <th>定員数</th>
+                    <th>受講金額</th>
+                    <th>講師名</th>
+                    <th>開講期間</th>
+                    <th>開講時間</th>
+                    <th>終了時間</th>
+                    <th>ステータス</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="c, row : ${cList}">
+                    <td>
+                        <a th:href="@{/course/detail/__${c.course_id}__}"
+                            th:text="${c.course_name} + '（' + ${c.location} + '）'"></a>
+                    </td>
+                    <td th:text="${c.capacity}"></td>
+                    <td th:text="${c.price}"></td>
+                    <td th:text="${c.instructor_name}"></td>
+                    <td th:text="${c.start_date} + ' ～ ' + ${c.end_date}"></td>
+                    <td th:text="${c.start_Time}"></td>
+                    <td th:text="${c.end_Time}"></td>
+                    <td th:text="${c.status}"></td>
+                </tr>
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+</body>
+
+</html>
