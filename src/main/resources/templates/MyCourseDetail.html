@@ -116,17 +116,16 @@
         </table>
 
         <form method="get">
+            <input type="hidden" name="course_id" th:value="${course.course_id}">
             <div class="button-area">
 
                 <!-- グループキャンセル -->
-                <button type="submit" th:formaction="@{/course/groupCancel(course_id=${course.course_id})}"
-                    class="cancel-button">
+                <button type="submit" th:formaction="@{/course/groupCancel}" class="cancel-button">
                     グループキャンセル
                 </button>
 
                 <!-- 個人キャンセル -->
-                <button type="submit" th:formaction="@{/cancelIndividual(course_id=${course.course_id})}"
-                    class="cancel-button">
+                <button type="submit" th:formaction="@{/course/cancelIndividual}" class="cancel-button">
                     個人キャンセル
                 </button>
 

@@ -19,7 +19,7 @@ public interface OthersDao {
     List<Student> findAllByGroupId(int courseID, UserCheck userCheck);
 
     // 該当の受講者を削除する。
-    // int deleteStudent(String name, int courseID);
+    int deleteStudent(String name, int courseID);
 
     // 全ての受講者情報を取得する。
     List<Student> getAllStudent();

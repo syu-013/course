@@ -8,7 +8,6 @@ import com.example.course.dao.OthersDao;
 import com.example.course.entity.Course;
 // import com.example.course.entity.Instructor;
 import com.example.course.entity.Student;
-import com.example.course.exception.NotDeleteException;
 // import com.example.course.exception.NotInsertException;
 import com.example.course.form.EnrollmentForm;
 import com.example.course.form.UserCheck;
@@ -47,14 +46,12 @@ public class OthersServiceImpl implements OthersService {
         List<Student> list = othersDao.findAllByGroupId(courseID, userCheck);
         return list;
     }
-    // @Override
-    // public void deleteStudent(String name,int courseID){
-    // int result=othersDao.deleteStudent(name,courseID);
-    // if(result==0){
-    // throw new NotDeleteException();
-    // }
 
-    // }
+    @Override
+    public void deleteStudent(String name, int courseID) {
+        othersDao.deleteStudent(name, courseID);
+    }
+
     @Override
     public List<Student> getAllStudent() {
         List<Student> list = othersDao.getAllStudent();

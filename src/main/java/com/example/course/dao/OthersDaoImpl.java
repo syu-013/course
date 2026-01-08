@@ -215,7 +215,7 @@ public class OthersDaoImpl implements OthersDao {
                 "    );";
 
         // SQLの実行 → Mapリストへ
-        List<Map<String, Object>> resultList = jdbcTemplate.queryForList(sql, userCheck.getUserName());
+        List<Map<String, Object>> resultList = jdbcTemplate.queryForList(sql, userCheck.getUserName(), courseID);
         // データリストを用意
         List<Student> list = new ArrayList<>();
         for (Map<String, Object> result : resultList) {
@@ -245,46 +245,43 @@ public class OthersDaoImpl implements OthersDao {
     }
 
     // 個人キャンセル（削除処理）
-    // @Override
-    // public int deleteStudent(String name, int courseId) {
+    @Override
+    public int deleteStudent(String name, int courseId) {
 
-    // // ① 名前 → studentID
-    // Integer studentID = findParticipantIdByName(name);
-    // if (studentID == null) {
-    // throw new RuntimeException("該当する受講者が存在しません: " + name);
-    // }
+        // ① 名前と講座IDから participant_id を取得
+        String sqlSelectIds = "SELECT participant_id FROM studentstb WHERE full_name = ? AND course_id = ?";
+        List<Integer> studentIDs = jdbcTemplate.queryForList(sqlSelectIds, Integer.class, name, courseId);
 
-    // // ② studentID が所属している group の一覧
-    // List<Integer> userGroups = findGroupIdsByParticipantId(studentID);
-    // if (userGroups.isEmpty()) {
-    // throw new RuntimeException("この受講者はどのグループにも所属していません");
-    // }
-    // // ④ 受講者が所属していて、かつ講座に申し込んでいる group を特定
-    // Integer targetGroupId = userGroups.stream()
-    // .filter(courseGroups::contains)
-    // .findFirst()
-    // .orElseThrow(() -> new RuntimeException("この受講者はこの講座に申し込んでいません"));
+        if (studentIDs.isEmpty()) {
+            throw new RuntimeException("該当する受講者が存在しません: " + name);
+        }
 
-    // // ⑤ enrollmentstb から該当の受講者を削除（個人キャンセル）
-    // String sqlDeleteEnroll = "DELETE FROM enrollmentstb WHERE group_id = ? AND
-    // participant_id = ?";
-    // int deleteCnt = jdbcTemplate.update(sqlDeleteEnroll, targetGroupId,
-    // studentID);
+        // 名前とコースIDでユニークとは限らないが、ここでは最初の一人を対象とするか、全て対象とするか。
+        // 要件では「名前と講座ＩＤからstudentstbに合致するparticipant_idを取得」とある。
+        // 複数ヒットした場合は全て処理するロジックにする。
 
-    // // ⑥ まだ group にメンバーが残っているか確認
-    // String sqlCount = "SELECT COUNT(*) FROM enrollmentstb WHERE group_id = ?";
-    // Integer count = jdbcTemplate.queryForObject(sqlCount, Integer.class,
-    // targetGroupId);
+        int deleteCount = 0;
 
-    // // ⑦ 0名なら applicationstb から group ごと削除（グループキャンセル）
-    // if (count != null && count == 0) {
-    // String sqlDeleteApp = "DELETE FROM applicationstb WHERE group_id = ? AND
-    // course_id = ?";
-    // jdbcTemplate.update(sqlDeleteApp, targetGroupId, courseId);
-    // }
+        for (Integer studentID : studentIDs) {
+            // ② participant_id が所属している group_id を取得
+            String sqlSelectGroups = "SELECT group_id FROM grouptb WHERE participant_id = ?";
+            List<Integer> groupIds = jdbcTemplate.queryForList(sqlSelectGroups, Integer.class, studentID);
 
-    // return deleteCnt;
-    // }
+            // ③ studentstb から削除
+            String sqlDeleteStudent = "DELETE FROM studentstb WHERE participant_id = ?";
+            deleteCount += jdbcTemplate.update(sqlDeleteStudent, studentID);
+
+            // ④ 取得した group_id を持つレコードを grouptb からすべて削除
+            if (!groupIds.isEmpty()) {
+                for (Integer groupId : groupIds) {
+                    String sqlDeleteGroup = "DELETE FROM grouptb WHERE group_id = ?";
+                    jdbcTemplate.update(sqlDeleteGroup, groupId);
+                }
+            }
+        }
+
+        return deleteCount;
+    }
 
     // 全ての受講者情報を取得する。
     @Override

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.course.entity.Course;
@@ -21,12 +22,8 @@ import com.example.course.entity.Student;
 import com.example.course.form.EnrollmentForm;
 import com.example.course.form.SearchForm;
 import com.example.course.form.UserCheck;
-
-// import org.springframework.web.bind.annotation.RequestMapping;
 import com.example.course.service.CourseService;
 import com.example.course.service.OthersService;
-import jakarta.servlet.http.HttpSession;
-import tools.jackson.databind.introspect.TypeResolutionContext.Empty;
 
 import org.springframework.validation.BindingResult;
 
@@ -300,23 +297,26 @@ public class CourseContoroller {
     @GetMapping("/cancelIndividual")
     public String cancelIndividual(@RequestParam("course_id") int courseId, Model model) {
         model.addAttribute("course_id", courseId);
+        UserCheck user = (UserCheck) session.getAttribute("user");
+        String userName = user.getUserName();
+        model.addAttribute("name", userName);
         return "CancelIndividual";
     }
 
-    // @PostMapping("/cancelIndividual/doCancel")
-    // public String doCancelIndividual(@RequestParam("course_id") int courseId,
-    // @RequestParam("name") String name,
-    // Model model) {
-    // othersService.deleteStudent(name, courseId);
-    // return "redirect:/course/registerdetail/" + courseId;
+    @PostMapping("/cancelIndividual/doCancel")
+    public String doCancelIndividual(@RequestParam("course_id") int courseId, @RequestParam("name") String name,
+            Model model) {
+        othersService.deleteStudent(name, courseId);
+        return "redirect:/course/exit";
 
-    // }
+    }
 
     // ★ グループメンバー画面に遷移（GET）
     @GetMapping("/groupCancel")
     public String showCancelGroupMember(@RequestParam("course_id") int courseId, Model model) {
 
-        List<Student> members = othersService.getAllStudent();
+        UserCheck user = (UserCheck) session.getAttribute("user");
+        List<Student> members = othersService.findAllByGroupId(courseId, user);
 
         model.addAttribute("members", members);
         model.addAttribute("course_id", courseId);
@@ -324,16 +324,19 @@ public class CourseContoroller {
     }
 
     // ★ グループキャンセル処理（POST）
-    // @PostMapping("/group/cancel")
-    // public String cancelGroup(@RequestParam("course_id") int courseId,
-    // @RequestParam("role") String role,
-    // @RequestParam("name") String name, RedirectAttributes redirectAttributes) {
-    // othersService.deleteStudent(name, courseId);
-    // redirectAttributes.addFlashAttribute(
-    // "message",
-    // role + "：" + name + " をキャンセルしました");
-    // return "redirect:/group/cancel";
-    // }
+    @PostMapping("/group/cancel")
+    public String cancelGroup(@RequestParam("course_id") int courseId,
+            @RequestParam("role") String role,
+            @RequestParam("name") String name, RedirectAttributes redirectAttributes) {
+
+        othersService.deleteStudent(name, courseId);
+
+        redirectAttributes.addFlashAttribute("message", role + "：" + name + " をキャンセルしました");
+
+        // redirect to group cancel page to show remaining members
+        // URL needs course_id parameter
+        return "redirect:/course/groupCancel?course_id=" + courseId;
+    }
 
     // ★ セッションを破棄して講座一覧画面へ
     @GetMapping("/exit")

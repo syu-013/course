@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,7 +55,8 @@
             border: 1px solid #000;
         }
 
-        .member-table th, .member-table td {
+        .member-table th,
+        .member-table td {
             border: 1px solid #000;
             padding: 15px 10px;
             text-align: center;
@@ -86,47 +88,50 @@
         }
     </style>
 </head>
+
 <body>
 
-    
-<div class="container">
 
-    <div th:if="${message}" 
-        style="margin-bottom: 20px; padding: 10px; background-color: #dff0d8; border: 1px solid #3c763d; color: #3c763d; font-weight: bold; text-align: center;">
-        <span th:text="${message}"></span>
+    <div class="container">
+
+        <div th:if="${message}"
+            style="margin-bottom: 20px; padding: 10px; background-color: #dff0d8; border: 1px solid #3c763d; color: #3c763d; font-weight: bold; text-align: center;">
+            <span th:text="${message}"></span>
+        </div>
+        <div class="header">
+            <div class="back-button" onclick="history.back()">戻る</div>
+            <div class="title">グループメンバー</div>
+        </div>
+
+        <table class="member-table">
+            <tbody>
+                <!-- Thymeleafでリストを表示 -->
+                <tr th:each="member : ${members}">
+                    <td class="role-cell" th:text="${member.role}"></td>
+                    <td class="name-cell" th:text="${member.name}"></td>
+
+                    <td class="cancel-cell">
+                        <form action="/course/group/cancel" method="post">
+                            <input type="hidden" name="role" th:value="${member.role}">
+                            <input type="hidden" name="name" th:value="${member.name}">
+                            <input type="hidden" name="course_id" th:value="${course_id}">
+                            <button type="submit"
+                                style="background:none;border:none;width:100%;height:100%;cursor:pointer;">
+                                キャンセル
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p class="note">
+            <span style="color: red;">※代表者がキャンセルした場合グループメンバー全員キャンセルとなります。</span><br>
+            また登録したい場合は再度登録しなおしてください。
+        </p>
+
     </div>
-    <div class="header">
-        <div class="back-button" onclick="history.back()">戻る</div>
-        <div class="title">グループメンバー</div>
-    </div>
-
-    <table class="member-table">
-        <tbody>
-            <!-- Thymeleafでリストを表示 -->
-            <tr th:each="member : ${members}">
-                <td class="role-cell" th:text="${member.role}"></td>
-                <td class="name-cell" th:text="${member.name}"></td>
-            
-                <td class="cancel-cell">
-                    <form action="/group/cancel" method="post">
-                        <input type="hidden" name="role" th:value="${member.role}">
-                        <input type="hidden" name="name" th:value="${member.name}">
-                        <input type="hidden" name="course_id" th:value="${course_id}">
-                        <button type="submit" style="background:none;border:none;width:100%;height:100%;cursor:pointer;">
-                            キャンセル
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <p class="note">
-        <span style="color: red;">※代表者がキャンセルした場合グループメンバー全員キャンセルとなります。</span><br>
-        また登録したい場合は再度登録しなおしてください。
-    </p>
-
-</div>
 
 </body>
+
 </html>

@@ -18,7 +18,7 @@ public interface OthersService {
     List<Student> findAllByGroupId(int courseID, UserCheck userCheck);
 
     // 該当の受講者を削除する。
-    // void deleteStudent(String name, int courseID);
+    void deleteStudent(String name, int courseID);
 
     // 全ての受講者情報を取得する。
     List<Student> getAllStudent();
