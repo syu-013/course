@@ -176,18 +176,15 @@ public class CourseDaoImpl implements CourseDao {
 
     @Override
     public int checkCapacity(int course_id) {
+        // 1. コースの定員を取得
         String sql = "SELECT capacity FROM coursetb WHERE course_id = ?";
         int capacity = jdbcTemplate.queryForObject(sql, Integer.class, course_id);
-        String sql2 = """
-                SELECT COUNT(*) AS participant_count
-                FROM grouptb g
-                WHERE g.group_id IN (
-                SELECT e.group_id
-                FROM enrollmentstb e
-                WHERE e.course_id = ?
-                );
-                """;
+
+        // 2. studentstb から現在の参加人数をカウント
+        String sql2 = "SELECT COUNT(*) FROM studentstb WHERE course_id = ?";
         int registeredCount = jdbcTemplate.queryForObject(sql2, Integer.class, course_id);
+
+        // 3. 残り席数を計算
         return capacity - registeredCount;
     }
 
