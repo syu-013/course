@@ -8,7 +8,6 @@ import java.util.Map;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.course.CourseApplication;
 import com.example.course.entity.Course;
 import com.example.course.entity.Student;
 import com.example.course.form.EnrollmentForm;
@@ -17,13 +16,10 @@ import com.example.course.form.UserCheck;
 @Repository
 public class OthersDaoImpl implements OthersDao {
 
-    private final CourseApplication courseApplication;
-
     private final JdbcTemplate jdbcTemplate;
 
-    public OthersDaoImpl(JdbcTemplate jdbcTemplate, CourseApplication courseApplication) {
+    public OthersDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.courseApplication = courseApplication;
     }
 
     // 受講者情報と申込情報を登録する。重複チェックも含む。
@@ -96,7 +92,7 @@ public class OthersDaoImpl implements OthersDao {
     public int registerEnrollment1(EnrollmentForm form) {
         // 受講者テーブルへの代表者の追加
         String sql = "INSERT INTO studentstb(full_name,email_address,representative_flag,course_id) VALUES(?,?,?,?)";
-        int cnt = jdbcTemplate.update(sql, form.getRepresentativeName(), form.getRepresentativeEmail(), 1,
+        jdbcTemplate.update(sql, form.getRepresentativeName(), form.getRepresentativeEmail(), 1,
                 form.getCourseId());
 
         // 受講者idの取得
@@ -132,7 +128,7 @@ public class OthersDaoImpl implements OthersDao {
                 Map<String, Object> result6 = jdbcTemplate.queryForMap(sql6);
                 no = (int) result6.get("Max_pid");
                 String sql7 = "INSERT INTO grouptb(group_id,participant_id) VALUES(?,?)";
-                int cnt7 = jdbcTemplate.update(sql7, noG, no);
+                jdbcTemplate.update(sql7, noG, no);
             }
         }
         return cnt3;
@@ -210,7 +206,7 @@ public class OthersDaoImpl implements OthersDao {
                 "                FROM\n" + //
                 "                    studentstb\n" + //
                 "                WHERE\n" + //
-                "                    full_name = ? \n" + //
+                "                    full_name = ? AND course_id = ?\n" + //
                 "            )\n" + //
                 "    );";
 
@@ -224,6 +220,10 @@ public class OthersDaoImpl implements OthersDao {
             student.setStudentID((int) result.get("participant_id"));
             student.setName((String) result.get("full_name"));
             student.setEmail((String) result.get("email_address"));
+
+            // roleを設定
+            boolean isRep = (boolean) result.get("representative_flag");
+            student.setRole(isRep ? "代表者" : "同行者");
 
             // リストに追加
             list.add(student);
@@ -247,36 +247,53 @@ public class OthersDaoImpl implements OthersDao {
     // 個人キャンセル（削除処理）
     @Override
     public int deleteStudent(String name, int courseId) {
+        // ① 名前と講座IDから participant_id と representative_flag を取得
+        String sqlSelectInfo = "SELECT participant_id, representative_flag FROM studentstb WHERE full_name = ? AND course_id = ?";
+        List<Map<String, Object>> studentsInfo = jdbcTemplate.queryForList(sqlSelectInfo, name, courseId);
 
-        // ① 名前と講座IDから participant_id を取得
-        String sqlSelectIds = "SELECT participant_id FROM studentstb WHERE full_name = ? AND course_id = ?";
-        List<Integer> studentIDs = jdbcTemplate.queryForList(sqlSelectIds, Integer.class, name, courseId);
-
-        if (studentIDs.isEmpty()) {
+        if (studentsInfo.isEmpty()) {
             throw new RuntimeException("該当する受講者が存在しません: " + name);
         }
 
-        // 名前とコースIDでユニークとは限らないが、ここでは最初の一人を対象とするか、全て対象とするか。
-        // 要件では「名前と講座ＩＤからstudentstbに合致するparticipant_idを取得」とある。
-        // 複数ヒットした場合は全て処理するロジックにする。
-
         int deleteCount = 0;
 
-        for (Integer studentID : studentIDs) {
+        for (Map<String, Object> info : studentsInfo) {
+            int studentID = (int) info.get("participant_id");
+            boolean isRep = (boolean) info.get("representative_flag");
+
             // ② participant_id が所属している group_id を取得
             String sqlSelectGroups = "SELECT group_id FROM grouptb WHERE participant_id = ?";
             List<Integer> groupIds = jdbcTemplate.queryForList(sqlSelectGroups, Integer.class, studentID);
 
-            // ③ studentstb から削除
-            String sqlDeleteStudent = "DELETE FROM studentstb WHERE participant_id = ?";
-            deleteCount += jdbcTemplate.update(sqlDeleteStudent, studentID);
+            if (isRep) {
+                // Representatives: Cancel EVERYONE in the group
+                if (!groupIds.isEmpty()) {
+                    for (Integer groupId : groupIds) {
+                        // Find all participants in this group
+                        String sqlSelectGroupMembers = "SELECT participant_id FROM grouptb WHERE group_id = ?";
+                        List<Integer> memberIds = jdbcTemplate.queryForList(sqlSelectGroupMembers, Integer.class,
+                                groupId);
 
-            // ④ 取得した group_id を持つレコードを grouptb からすべて削除
-            if (!groupIds.isEmpty()) {
-                for (Integer groupId : groupIds) {
-                    String sqlDeleteGroup = "DELETE FROM grouptb WHERE group_id = ?";
-                    jdbcTemplate.update(sqlDeleteGroup, groupId);
+                        // Delete all members from studentstb
+                        for (Integer memberId : memberIds) {
+                            String sqlDeleteMember = "DELETE FROM studentstb WHERE participant_id = ?";
+                            deleteCount += jdbcTemplate.update(sqlDeleteMember, memberId);
+                        }
+
+                        // Delete the group itself
+                        String sqlDeleteGroup = "DELETE FROM grouptb WHERE group_id = ?";
+                        jdbcTemplate.update(sqlDeleteGroup, groupId);
+                    }
                 }
+            } else {
+                // Companion: Cancel ONLY themselves
+                // Delete from studentstb
+                String sqlDeleteStudent = "DELETE FROM studentstb WHERE participant_id = ?";
+                deleteCount += jdbcTemplate.update(sqlDeleteStudent, studentID);
+
+                // Delete from grouptb (remove only their link)
+                String sqlDeleteGroupLink = "DELETE FROM grouptb WHERE participant_id = ?";
+                jdbcTemplate.update(sqlDeleteGroupLink, studentID);
             }
         }
 
@@ -358,6 +375,13 @@ public class OthersDaoImpl implements OthersDao {
         String sql = "SELECT COUNT(*) FROM studentstb WHERE full_name = ? AND email_address = ?";
         // SQLの実行 → Mapリストへ
         return jdbcTemplate.queryForObject(sql, Integer.class, userCheck.getUserName(), userCheck.getEmail());
+    }
+
+    @Override
+    public boolean isRegistered(String email, int courseId) {
+        String sql = "SELECT COUNT(*) FROM studentstb WHERE email_address = ? AND course_id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email, courseId);
+        return count != null && count > 0;
     }
 
 }

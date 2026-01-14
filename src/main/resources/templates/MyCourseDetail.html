@@ -27,6 +27,10 @@
             cursor: pointer;
             width: 100px;
             height: 40px;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .detail-title {
@@ -65,7 +69,7 @@
 
 <body>
     <div class="detail-header">
-        <button type="button" class="back-button" onclick="history.back()">戻る</button>
+        <a class="back-button" th:href="@{/course/list}">戻る</a>
         <h1 class="detail-title">講座の詳細</h1>
         <div style="width: 100px;"></div>
         <div style="width: 100px;"></div>
@@ -120,12 +124,13 @@
             <div class="button-area">
 
                 <!-- グループキャンセル -->
-                <button type="submit" th:formaction="@{/course/groupCancel}" class="cancel-button">
+                <button type="submit" th:if="${isGroup}" th:formaction="@{/course/groupCancel}" class="cancel-button">
                     グループキャンセル
                 </button>
 
                 <!-- 個人キャンセル -->
-                <button type="submit" th:formaction="@{/course/cancelIndividual}" class="cancel-button">
+                <button type="submit" th:if="${!isGroup}" th:formaction="@{/course/cancelIndividual}"
+                    class="cancel-button">
                     個人キャンセル
                 </button>
 

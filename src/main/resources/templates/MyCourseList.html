@@ -166,7 +166,11 @@
         </div>
         <p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
 
-        <table class="data-table">
+        <!-- ✅ リストが空の場合のメッセージ -->
+        <p th:if="${cList.isEmpty()}" style="font-weight: bold; margin: 20px 0;">登録されている講座がありません。</p>
+
+        <!-- ✅ リストがある場合のみテーブルを表示 -->
+        <table class="data-table" th:if="${!cList.isEmpty()}">
             <thead>
                 <tr>
                     <th>講座名（場所）</th>

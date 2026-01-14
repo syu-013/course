@@ -45,4 +45,6 @@ public interface OthersDao {
     // 追加メソッド
     int registerEnrollment1(EnrollmentForm form);
 
+    // 重複登録チェック
+    boolean isRegistered(String email, int courseId);
 }

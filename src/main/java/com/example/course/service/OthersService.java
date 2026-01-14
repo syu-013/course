@@ -44,4 +44,7 @@ public interface OthersService {
     // メソッドの追加
     void registerEnrollment1(EnrollmentForm form);
     // void registerEnrollment2(List<String> nameList);
+
+    // 重複登録チェック
+    boolean isRegistered(String email, int courseId);
 }

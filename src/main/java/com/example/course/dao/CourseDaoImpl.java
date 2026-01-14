@@ -44,7 +44,7 @@ public class CourseDaoImpl implements CourseDao {
             course.setStart_Time(rs.getObject("start_time", LocalTime.class));
             course.setEnd_date(rs.getObject("end_date", LocalDate.class));
             course.setEnd_Time(rs.getObject("end_time", LocalTime.class));
-            course.setStatus(rs.getString("status"));
+            course.setStatus(isAcceptingApplications(rs.getInt("course_id")));
             return course;
         });
         return list;
@@ -119,39 +119,30 @@ public class CourseDaoImpl implements CourseDao {
     @Override
     public Course getCourseDetails(int course_id) {
         String sql = "SELECT * FROM coursetb WHERE course_id = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[] { course_id }, (rs, rowNum) -> {
-            Course course = new Course();
-            course.setCourse_id(rs.getInt("course_id"));
-            course.setCourse_name(rs.getString("course_name"));
-            course.setLocation(rs.getString("location"));
-            course.setInstructor_id(rs.getInt("instructor_id"));
-            course.setCapacity(rs.getInt("capacity"));
-            course.setPrice(rs.getInt("price"));
-            course.setStart_date(rs.getObject("start_date", LocalDate.class));
-            course.setStart_Time(rs.getObject("start_time", LocalTime.class));
-            course.setEnd_date(rs.getObject("end_date", LocalDate.class));
-            course.setEnd_Time(rs.getObject("end_time", LocalTime.class));
-            course.setStatus(isAcceptingApplications(rs.getInt("course_id")));
-            return course;
-        });
+        return jdbcTemplate.queryForObject(
+                sql,
+                (rs, rowNum) -> {
+                    Course course = new Course();
+                    course.setCourse_id(rs.getInt("course_id"));
+                    course.setCourse_name(rs.getString("course_name"));
+                    course.setLocation(rs.getString("location"));
+                    course.setInstructor_id(rs.getInt("instructor_id"));
+                    course.setCapacity(rs.getInt("capacity"));
+                    course.setPrice(rs.getInt("price"));
+                    course.setStart_date(rs.getObject("start_date", LocalDate.class));
+                    course.setStart_Time(rs.getObject("start_time", LocalTime.class));
+                    course.setEnd_date(rs.getObject("end_date", LocalDate.class));
+                    course.setEnd_Time(rs.getObject("end_time", LocalTime.class));
+                    course.setStatus(isAcceptingApplications(rs.getInt("course_id")));
+                    return course;
+                },
+                course_id);
     }
 
     @Override
     public boolean isCapacity(int course_id) {
-        String sql = "SELECT capacity FROM coursetb WHERE course_id = ?";
-        int capacity = jdbcTemplate.queryForObject(sql, Integer.class, course_id);
-        String sql2 = """
-                SELECT COUNT(*) AS participant_count
-                FROM grouptb g
-                WHERE g.group_id IN (
-                SELECT e.group_id
-                FROM enrollmentstb e
-                WHERE e.course_id = ?
-                );
-                """;
-        int registeredCount = jdbcTemplate.queryForObject(sql2, Integer.class, course_id);
-        // 残りの席がある場合trueを返す
-        return registeredCount < capacity;
+        // 既存の checkCapacity メソッドとロジックを合わせる
+        return checkCapacity(course_id) > 0;
     }
 
     @Override
@@ -164,14 +155,9 @@ public class CourseDaoImpl implements CourseDao {
 
     @Override
     public String isAcceptingApplications(int course_id) {
-        if (isPeriodEnded(course_id) && isCapacity(course_id)) {
-            return "申込受付中";
-        } else if (!isPeriodEnded(course_id)) {
-            return "期間終了";
-        } else if (!isCapacity(course_id)) {
-            return "満席";
-        }
-        return "開催予定";
+        String currentStatus = calculateStatus(course_id);
+        updateCourseStatusIfNeeded(course_id, currentStatus);
+        return currentStatus;
     }
 
     @Override
@@ -194,6 +180,45 @@ public class CourseDaoImpl implements CourseDao {
             return jdbcTemplate.queryForObject(sql, String.class, instructor_id);
         } catch (Exception e) {
             return "不明"; // エラー時の対策
+        }
+    }
+
+    /**
+     * 講座の現在のステータスを計算
+     */
+    private String calculateStatus(int course_id) {
+        if (!isPeriodEnded(course_id)) {
+            // 期間が終了している（isPeriodEndedがfalseの場合）
+            return "期間終了";
+        } else if (!isCapacity(course_id)) {
+            // 満席（isCapacityがfalseの場合）
+            return "満席";
+        } else if (isPeriodEnded(course_id) && isCapacity(course_id)) {
+            // 期間内かつ空席あり
+            return "申込受付中";
+        }
+        return "開催予定";
+    }
+
+    /**
+     * データベースのステータスと計算したステータスを比較し、異なる場合は更新
+     */
+    private void updateCourseStatusIfNeeded(int course_id, String calculatedStatus) {
+        try {
+            // データベースから現在のステータスを取得
+            String sql = "SELECT status FROM coursetb WHERE course_id = ?";
+            String dbStatus = jdbcTemplate.queryForObject(sql, String.class, course_id);
+
+            // ステータスが異なる場合のみ更新
+            if (!calculatedStatus.equals(dbStatus)) {
+                String updateSql = "UPDATE coursetb SET status = ? WHERE course_id = ?";
+                jdbcTemplate.update(updateSql, calculatedStatus, course_id);
+                System.out.println(
+                        "講座ID " + course_id + " のステータスを「" + dbStatus + "」から「" + calculatedStatus + "」に更新しました。");
+            }
+        } catch (Exception e) {
+            // エラーが発生してもステータス取得自体は失敗させない
+            System.err.println("ステータス更新時にエラーが発生しました: " + e.getMessage());
         }
     }
 

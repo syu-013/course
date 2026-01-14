@@ -68,11 +68,6 @@ public class OthersServiceImpl implements OthersService {
     public boolean existsUser(UserCheck checkForm) {
         return othersDao.countUser(checkForm) > 0;
     }
-    // @Override
-    // public List<Instructor> getAllInstructor(){
-    // List<Instructor>list=othersDao. getAllInstructor();
-    // return list;
-
     // }
     // @Override
     // public void deleteInstructor(int instructorId){
@@ -82,4 +77,9 @@ public class OthersServiceImpl implements OthersService {
     // }
 
     // }
+
+    @Override
+    public boolean isRegistered(String email, int courseId) {
+        return othersDao.isRegistered(email, courseId);
+    }
 }

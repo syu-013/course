@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,6 +40,8 @@
             font-weight: bold;
             color: #000;
             cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .container {
@@ -48,7 +51,7 @@
             background-color: #fff;
             border: 1px solid #000;
             padding: 30px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .form-table {
@@ -121,7 +124,7 @@
 
 <body>
     <div class="detail-header">
-        <button type="button" class="back-button" onclick="history.back()">戻る</button>
+        <a class="back-button" th:href="@{/course/list}">戻る</a>
         <h1 class="detail-title">講座の詳細</h1>
         <div style="width: 100px;"></div>
     </div>
@@ -137,7 +140,8 @@
                 <td>
                     <div class="info-row">講師ID：<span th:text="${course.instructor_id}"></span></div>
                     <div class="info-row">開催場所：<span th:text="${course.location}"></span></div>
-                    <div class="info-row">受講料：¥<span th:text="${#numbers.formatInteger(course.price, 3, 'COMMA')}"></span></div>
+                    <div class="info-row">受講料：¥<span
+                            th:text="${#numbers.formatInteger(course.price, 3, 'COMMA')}"></span></div>
                     <div class="info-row">
                         定員：<span th:text="${course.capacity}"></span>名　
                         （残り <span th:text="${remainingSeats}"></span> 席）
@@ -149,7 +153,7 @@
                 <th>開催期間</th>
                 <td>
                     <div class="info-row">
-                        <span th:text="${#temporals.format(course.start_date, 'yyyy年MM月dd日')}"></span> ～ 
+                        <span th:text="${#temporals.format(course.start_date, 'yyyy年MM月dd日')}"></span> ～
                         <span th:text="${#temporals.format(course.end_date, 'yyyy年MM月dd日')}"></span>
                     </div>
                 </td>
@@ -158,7 +162,7 @@
                 <th>時間</th>
                 <td>
                     <div class="info-row">
-                        <span th:text="${#temporals.format(course.start_Time, 'HH:mm')}"></span> ～ 
+                        <span th:text="${#temporals.format(course.start_Time, 'HH:mm')}"></span> ～
                         <span th:text="${#temporals.format(course.end_Time, 'HH:mm')}"></span>
                     </div>
                 </td>
@@ -173,7 +177,7 @@
             <span th:text="${errorMessage}"></span>
             （残り <span th:text="${remainingSeats}"></span> 席）
         </div>
-        
+
 
         <!-- ✅ 参加人数をURLパラメータで送信 -->
         <form th:action="@{/course/add/form}" method="get">
@@ -188,4 +192,5 @@
         </form>
     </div>
 </body>
+
 </html>

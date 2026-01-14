@@ -153,8 +153,12 @@ public class CourseContoroller {
             Course course = courseService.getMyCourseDetails(id, user);
             model.addAttribute("course", course);
             session.setAttribute("course_id", id);
-            // ※ここで登録詳細に遷移します
-            // ただし、登録講座詳細画面ができていません
+
+            // ★ 申し込み人数を取得して、グループか個人かを判定
+            List<Student> members = othersService.findAllByGroupId(id, user);
+            model.addAttribute("members", members);
+            model.addAttribute("isGroup", members != null && members.size() > 1);
+
             return "MyCourseDetail";
         }
     }
@@ -163,6 +167,15 @@ public class CourseContoroller {
     public String userCheck(@RequestParam("count") int count, Model model) {
         // 講座IDをセッションから取得
         Integer courseId = (Integer) session.getAttribute("course_id");
+
+        // ★ 講座ステータスの最新確認
+        String status = courseService.isAcceptingApplications(courseId);
+        if ("満席".equals(status) || "期間終了".equals(status)) {
+            model.addAttribute("errorMessage", "この講座は現在「" + status + "」のため、申し込むことができません。");
+            model.addAttribute("remainingSeats", courseService.checkCapacity(courseId));
+            model.addAttribute("course", courseService.getCourseDetails(courseId));
+            return "CourseDetail";
+        }
 
         // 残席数取得
         int remainingSeats = courseService.checkCapacity(courseId);
@@ -236,7 +249,28 @@ public class CourseContoroller {
             model.addAttribute("enrollmentForm", form);
             return "participant_registration2";
         }
-        form.setCourseId((int) session.getAttribute("course_id"));
+
+        // 講座IDをセッションから取得 (nullチェック推奨だが既存コードに合わせる)
+        Integer courseId = (Integer) session.getAttribute("course_id");
+
+        // ★ 申込実行時の最終ステータスチェック
+        String status = courseService.isAcceptingApplications(courseId);
+        if ("満席".equals(status) || "期間終了".equals(status)) {
+            model.addAttribute("errorMessage", "申し訳ありません。手続き中に講座が「" + status + "」になったため、登録を完了できませんでした。");
+            model.addAttribute("remainingSeats", courseService.checkCapacity(courseId));
+            model.addAttribute("course", courseService.getCourseDetails(courseId));
+            return "CourseDetail";
+        }
+
+        // 重複チェック
+        if (othersService.isRegistered(form.getRepresentativeEmail(), courseId)) {
+            model.addAttribute("errorMessage", "このメールアドレスは既にこの講座に登録されています。");
+            model.addAttribute("enrollmentForm", form);
+            model.addAttribute("count", session.getAttribute("count")); // countも戻す必要があるかもしれない
+            return "participant_registration2";
+        }
+
+        form.setCourseId(courseId);
         othersService.registerEnrollment1(form);
 
         // ※ユーザー情報をsessionに確保
@@ -291,6 +325,14 @@ public class CourseContoroller {
         model.addAttribute("remainingSeats", remainingSeats);
         Course course = courseService.getCourseDetails(id);
         model.addAttribute("course", course);
+
+        // ★ ログインユーザー情報を取得して判定を追加
+        UserCheck user = (UserCheck) session.getAttribute("user");
+        if (user != null) {
+            List<Student> members = othersService.findAllByGroupId(id, user);
+            model.addAttribute("isGroup", members != null && members.size() > 1);
+        }
+
         return "MyCourseDetail";
     }
 
@@ -307,7 +349,7 @@ public class CourseContoroller {
     public String doCancelIndividual(@RequestParam("course_id") int courseId, @RequestParam("name") String name,
             Model model) {
         othersService.deleteStudent(name, courseId);
-        return "redirect:/course/exit";
+        return "redirect:/course/list";
 
     }
 
@@ -332,6 +374,11 @@ public class CourseContoroller {
         othersService.deleteStudent(name, courseId);
 
         redirectAttributes.addFlashAttribute("message", role + "：" + name + " をキャンセルしました");
+
+        // 代表者の場合はマイ講座一覧へ戻る
+        if ("代表者".equals(role)) {
+            return "redirect:/course/list";
+        }
 
         // redirect to group cancel page to show remaining members
         // URL needs course_id parameter
